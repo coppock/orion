@@ -8,16 +8,16 @@ import sys
 from torchvision import models
 import torch
 
-home_directory = os.path.expanduser( '~' )
-sys.path.append(f"{home_directory}/DeepLearningExamples/PyTorch/LanguageModeling/Transformer-XL/pytorch")
-sys.path.append(f"{home_directory}/DeepLearningExamples/PyTorch/LanguageModeling/Transformer-XL/pytorch/utils")
-from benchmark_suite.transformer_trainer import transformer_loop
-sys.path.append(f"{home_directory}/DeepLearningExamples/PyTorch/LanguageModeling/BERT")
-from bert_trainer import bert_loop
+# home_directory = os.path.expanduser( '~' )
+# sys.path.append(f"{home_directory}/DeepLearningExamples/PyTorch/LanguageModeling/Transformer-XL/pytorch")
+# sys.path.append(f"{home_directory}/DeepLearningExamples/PyTorch/LanguageModeling/Transformer-XL/pytorch/utils")
+# from benchmark_suite.transformer_trainer import transformer_loop
+# sys.path.append(f"{home_directory}/DeepLearningExamples/PyTorch/LanguageModeling/BERT")
+# from bert_trainer import bert_loop
 
 from benchmark_suite.train_imagenet import imagenet_loop
-from benchmark_suite.toy_models.bnorm_trainer import bnorm_loop
-from benchmark_suite.toy_models.conv_bn_trainer import conv_bn_loop
+# from benchmark_suite.toy_models.bnorm_trainer import bnorm_loop
+# from benchmark_suite.toy_models.conv_bn_trainer import conv_bn_loop
 
 from src.scheduler_frontend import PyScheduler
 
@@ -25,10 +25,10 @@ function_dict = {
     "resnet50": imagenet_loop,
     "resnet101": imagenet_loop,
     "mobilenet_v2": imagenet_loop,
-    "bnorm": bnorm_loop,
-    "conv_bnorm": conv_bn_loop,
-    "bert": bert_loop,
-    "transformer": transformer_loop,
+    # "bnorm": bnorm_loop,
+    # "conv_bnorm": conv_bn_loop,
+    # "bert": bert_loop,
+    # "transformer": transformer_loop,
 }
 
 def seed_everything(seed: int):
@@ -124,10 +124,8 @@ def launch_jobs(config_dict_list, input_args, run_eval):
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--algo', type=str, required=True,
-                        help='choose one of orion | reef | sequential')
-    parser.add_argument('--config_file', type=str, required=True,
-                        help='path to the experiment configuration file')
+    parser.add_argument('--algo', default='orion', choices=['orion', 'reef', 'sequential'])
+    parser.add_argument('config_file')
     parser.add_argument('--reef_depth', type=int, default=1,
                         help='If reef is used, this stands for the queue depth')
     parser.add_argument('--orion_max_be_duration', type=int, default=1,

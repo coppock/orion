@@ -553,9 +553,10 @@ extern "C" {
 
 		struct passwd *pw = getpwuid(getuid());
 		char *homedir = pw->pw_dir;
-		char* lib_path = "/orion/src/cuda_capture/libinttemp.so";
+		char* lib_path = getenv("LD_PRELOAD");
 
-		klib = dlopen(strcat(homedir, lib_path), RTLD_NOW | RTLD_GLOBAL);
+		assert(lib_path != NULL);
+		klib = dlopen(lib_path, RTLD_NOW | RTLD_GLOBAL);
 
 		if (!klib) {
 			fprintf(stderr, "Error: %s\n", dlerror());
