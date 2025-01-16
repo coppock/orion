@@ -1,23 +1,17 @@
-CC=g++
-NVCC=/usr/local/cuda-10.2/bin/nvcc
-CFLAGS=-O3
-CUDAINCLUDE=/usr/local/cuda-10.2/include/
-CUDALIB=/usr/local/cuda-10.2/lib64
+CUDA_TOOLKIT = /usr/local/cuda
 
-utils_sched.o: utils_sched.cpp
-	$(NVCC) $(CFLAGS) -Xcompiler  -fPIC -x cu -shared -c utils_sched.cpp -I$(CUDAINCLUDE) -L$(CUDALIB) -lcudart -lpthread
-
-scheduler.o: scheduler.cpp
-	$(NVCC) $(CFLAGS) -Xcompiler  -fPIC  -x cu -shared -c scheduler.cpp -I$(CUDAINCLUDE) -L$(CUDALIB) -lcudart -lpthread
-
-scheduler_eval.o: scheduler_eval.cpp
-	$(NVCC) $(CFLAGS) -Xcompiler  -fPIC  -x cu -shared -c scheduler_eval.cpp -I$(CUDAINCLUDE) -L$(CUDALIB) -lcudart -lpthread
+CXXFLAGS = -g -O3 -fPIC -shared -DDEBUG=1 -I$(CUDA_TOOLKIT)/include
+LDFLAGS = -L$(CUDA_TOOLKIT)/lib64
+LDLIBS = -lcudnn -lcudart -lcublas
 
 scheduler_eval.so: scheduler_eval.o utils_sched.o
-	 $(CC) $(CFLAGS) -fPIC -shared utils_sched.o scheduler_eval.o -I$(CUDAINCLUDE) -L$(CUDALIB) -lcudart -lpthread -o scheduler_eval.so
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o scheduler_eval.so utils_sched.o \
+	    scheduler_eval.o $(LDLIBS)
 
-all:
-	make scheduler_eval.so
+scheduler_eval.o: scheduler.h
+scheduler.h: utils_sched.h
+utils_sched.o: utils_sched.h
+utils_sched.h: ../system_utils.h
 
 clean:
-	rm -rf *.o *.so
+	rm -rf *.o

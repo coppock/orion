@@ -1,12 +1,18 @@
-CC=g++
-CUDAINCLUDE=/usr/local/cuda-10.2/include/
-CUDALIB=/usr/local/cuda-10.2/lib64
+CUDA_TOOLKIT = /usr/local/cuda
 
-libinttemp.so: utils_interc.cpp intercept_cudnn.cpp intercept_cublas.cpp intercept_temp.cpp
-	$(CC) -O3 -fPIC -shared utils_interc.cpp intercept_cudnn.cpp intercept_cublas.cpp intercept_temp.cpp -I$(CUDAINCLUDE) -L$(CUDALIB) -lcudart -lpthread -o libinttemp.so
+CXXFLAGS = -O3 -fPIC -shared -I$(CUDA_TOOLKIT)/include
+LDFLAGS = -L$(CUDA_TOOLKIT)/lib64
+LDLIBS = -lcudart
 
-all:
-	make libinttemp.so
+libinttemp.so: utils_interc.o intercept_cudnn.o intercept_cublas.o \
+    intercept_temp.o
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o libinttemp.so utils_interc.o \
+	    intercept_cudnn.o intercept_cublas.o intercept_temp.o $(LDLIBS)
+
+intercept_cublas.o: intercept_temp.h
+intercept_cudnn.o: intercept_temp.h
+intercept_temp.o: intercept_temp.h
+intercept_h: ../system_utils.h
 
 clean:
-	rm -rf *.o libinttemp.so
+	rm -rf *.o
