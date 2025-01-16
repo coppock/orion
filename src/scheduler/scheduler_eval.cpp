@@ -596,7 +596,7 @@ extern "C" {
 			for (auto info: op_info_vector[i])
 				max_sm_used = max(max_sm_used, info.sm_used);
 			max_sms_clients.push_back(max_sm_used);
-			printf("----------- SIZE: %d\n", op_info_vector[i].size());
+			printf("----------- SIZE: %lu\n", op_info_vector[i].size());
 			is_train.push_back(train[i]);
 		}
 
@@ -625,7 +625,7 @@ extern "C" {
 		queue<func_record>** buffers = *buffers_ptr;
 		for (int i=0; i<num_clients; i++) {
 			buffers[i] = new queue<func_record>();
-			printf("size is %d\n", buffers[i]->size());
+			printf("size is %lu\n", buffers[i]->size());
 		}
 
 		pthread_mutex_t*** client_mutexes_ptr = (pthread_mutex_t***)dlsym(klib, "mutexes");
