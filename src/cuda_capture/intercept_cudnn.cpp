@@ -127,7 +127,7 @@ cudnnStatus_t cudnnBatchNormalizationForwardTrainingEx(cudnnHandle_t handle, cud
 	return status;
 }
 
-
+#ifdef CUDNN_8
 cudnnStatus_t cudnnBatchNormalizationForwardInference(cudnnHandle_t handle, cudnnBatchNormMode_t mode, const void *alpha, const void *beta, const cudnnTensorDescriptor_t xDesc, const void *x, const cudnnTensorDescriptor_t yDesc, void *y, const cudnnTensorDescriptor_t bnScaleBiasMeanVarDesc, const void *bnScale, const void *bnBias, const void *estimatedMean, const void *estimatedVariance, double epsilon)
 
 {
@@ -337,7 +337,7 @@ cudnnStatus_t cudnnRNNForwardTraining(
 
 	return status;
 }
-
+#endif /* defined(CUDNN_8) */
 
 // backward
 

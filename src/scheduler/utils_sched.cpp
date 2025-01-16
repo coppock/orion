@@ -202,6 +202,7 @@ void register_functions() {
 	*(void **)(&cudnn_bnorm_function) = dlsym(RTLD_DEFAULT, "cudnnBatchNormalizationForwardTrainingEx");
 	assert(cudnn_bnorm_function != NULL);
 
+#ifdef CUDNN_8
 	// for bnorm infer
 	*(void **)(&cudnn_bnorm_infer_function) = dlsym(RTLD_DEFAULT, "cudnnBatchNormalizationForwardInference");
 	assert(cudnn_bnorm_infer_function != NULL);
@@ -213,6 +214,7 @@ void register_functions() {
 	// for rnn train
 	*(void **)(&cudnn_rnn_train_function) = dlsym(RTLD_DEFAULT, "cudnnRNNForwardTraining");
 	assert(cudnn_rnn_train_function != NULL);
+#endif
 
 	// for bnorm backward
 	*(void **)(&cudnn_bnorm_bw_function) = dlsym(RTLD_DEFAULT, "cudnnBatchNormalizationBackwardEx");
