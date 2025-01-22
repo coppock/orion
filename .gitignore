@@ -8,6 +8,8 @@
 *.svg
 *.png
 .DS_Store
+.conda
+.venv
 .idea/
 __pycache__/
 orion.egg-info/

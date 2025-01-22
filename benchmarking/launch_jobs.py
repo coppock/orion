@@ -31,8 +31,10 @@ function_dict = {
     # "transformer": transformer_loop,
 }
 
+
 def seed_everything(seed: int):
-    import random, os
+    import random
+    import os
     import numpy as np
 
     random.seed(seed)
@@ -40,6 +42,7 @@ def seed_everything(seed: int):
     np.random.seed(seed)
     torch.manual_seed(seed)
     torch.cuda.manual_seed(seed)
+
 
 def launch_jobs(config_dict_list, input_args, run_eval):
 
@@ -53,33 +56,38 @@ def launch_jobs(config_dict_list, input_args, run_eval):
 
     # init
 
-    num_barriers = num_clients+1
-    barriers = [threading.Barrier(num_barriers) for i in range(num_clients)]
-    client_barrier = threading.Barrier(num_clients)
-    home_directory = os.path.expanduser( '~' )
+    barrier = threading.Barrier(num_clients + 1)
+    home_directory = os.path.expanduser('~')
     if run_eval:
-        sched_lib = cdll.LoadLibrary(home_directory + "/orion/src/scheduler/scheduler_eval.so")
+        sched_lib = cdll.LoadLibrary(
+            home_directory + "/orion/src/scheduler/scheduler_eval.so")
     else:
-        sched_lib = cdll.LoadLibrary(home_directory + "/orion/src/scheduler/scheduler.so")
+        sched_lib = cdll.LoadLibrary(
+            home_directory + "/orion/src/scheduler/scheduler.so")
     py_scheduler = PyScheduler(sched_lib, num_clients)
 
     print(torch.__version__)
 
     model_names = [config_dict['arch'] for config_dict in config_dict_list]
-    model_files = [config_dict['kernel_file'] for config_dict in config_dict_list]
+    model_files = [config_dict['kernel_file']
+                   for config_dict in config_dict_list]
 
-    additional_model_files = [config_dict['additional_kernel_file'] if 'additional_kernel_file' in config_dict else None for config_dict in config_dict_list]
-    num_kernels = [config_dict['num_kernels'] for config_dict in config_dict_list]
+    additional_model_files = [config_dict['additional_kernel_file']
+                              if 'additional_kernel_file' in config_dict else None for config_dict in config_dict_list]
+    num_kernels = [config_dict['num_kernels']
+                   for config_dict in config_dict_list]
     num_iters = [config_dict['num_iters'] for config_dict in config_dict_list]
-    train_list = [config_dict['args']['train'] for config_dict in config_dict_list]
-    additional_num_kernels = [config_dict['additional_num_kernels'] if 'additional_num_kernels' in config_dict else None  for config_dict in config_dict_list]
+    train_list = [config_dict['args']['train']
+                  for config_dict in config_dict_list]
+    additional_num_kernels = [config_dict['additional_num_kernels']
+                              if 'additional_num_kernels' in config_dict else None for config_dict in config_dict_list]
     tids = []
     threads = []
     for i, config_dict in enumerate(config_dict_list):
         func = function_dict[config_dict['arch']]
         model_args = config_dict['args']
-        model_args.update({"num_iters":num_iters[i], "local_rank": 0, "barriers": barriers, "client_barrier": client_barrier, "tid": i})
-
+        model_args.update({"num_iters": num_iters[i], "local_rank": 0,
+                          "barrier": barrier, "tid": i})
         thread = threading.Thread(target=func, kwargs=model_args)
         thread.start()
         tids.append(thread.native_id)
@@ -100,9 +108,9 @@ def launch_jobs(config_dict_list, input_args, run_eval):
             num_iters,
             True,
             run_eval,
-            input_args.algo=='reef',
-            input_args.algo=='sequential',
-            input_args.reef_depth if input_args.algo=='reef' else input_args.orion_max_be_duration,
+            input_args.algo == 'reef',
+            input_args.algo == 'sequential',
+            input_args.reef_depth if input_args.algo == 'reef' else input_args.orion_max_be_duration,
             input_args.orion_hp_limit,
             input_args.orion_start_update,
             train_list
@@ -121,10 +129,12 @@ def launch_jobs(config_dict_list, input_args, run_eval):
 
     print("--------- all threads joined!")
 
+
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--algo', default='orion', choices=['orion', 'reef', 'sequential'])
+    parser.add_argument('--algo', default='orion',
+                        choices=['orion', 'reef', 'sequential'])
     parser.add_argument('config_file')
     parser.add_argument('--reef_depth', type=int, default=1,
                         help='If reef is used, this stands for the queue depth')

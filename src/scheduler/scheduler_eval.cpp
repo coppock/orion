@@ -340,22 +340,19 @@ void* Scheduler::busy_wait_profile(int num_clients, int iter, bool warmup, int w
 					else if (seen[hp_client]>0 && (size + op_info_0.sm_used <= sm_threshold) &&  ((op_info_0.profile == -1 || profiles[hp_client]==-1 || (profiles[hp_client] != op_info_0.profile))))
 						schedule = true;
 					if (schedule && large_found) {
-						bool do_schedule = true;
 						for (int k=0; k<num_clients-1; k++) {
-						 	if (event_ids[k]>=1) {
+							if (event_ids[k]>=1) {
 								cudaError_t status = cudaEventQuery(*(events[k][event_ids[k]-1]));
 								if (status != cudaSuccess) {
-									do_schedule = false;
+									schedule = false;
 									break;
 								}
 							}
 						}
-						if (do_schedule) {
+						if (schedule) {
 							large_found = false;
 							sum = 0;
 						}
-						else
-							schedule = false;
 					}
 					if (schedule) {
 						//if (op_info_0.duration > depth && num_client_cur_iters[1] < num_client_max_iters[1] && seen[1]==0) {
